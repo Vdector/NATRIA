@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NATRIA VPN — VPN без границ</title>
+<meta name="description" content="VPN без границ. 120+ серверов в 47 странах. Один клик — и весь мир снова открыт.">
+<link rel="manifest" href="assets/site.webmanifest">
+<meta property="og:image" content="assets/logo.png">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="96x96" href="assets/favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon-256.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#05060a;
+  --bg-soft:#090b12;
+  --card:rgba(255,255,255,.028);
+  --line:rgba(255,255,255,.08);
+  --line-soft:rgba(255,255,255,.05);
+  --text:#eef1fa;
+  --muted:#8b93ac;
+  --muted-2:#5f6680;
+  --a:#3a97ff;
+  --b:#8fd6ff;
+  --green:#37e58f;
+  --radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(58,151,255,.4);color:#fff}
+a{color:inherit;text-decoration:none}
+img,svg{display:block}
+.container{width:min(1160px,calc(100% - 48px));margin-inline:auto}
+.grad{background:linear-gradient(100deg,var(--a) 10%,var(--b) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- backdrop ---------- */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
+.orb-a{width:640px;height:640px;top:-260px;left:-160px;background:radial-gradient(circle,rgba(58,151,255,.22),transparent 65%)}
+.orb-b{width:720px;height:720px;top:30%;right:-320px;background:radial-gradient(circle,rgba(143,214,255,.10),transparent 65%)}
+.orb-c{width:600px;height:600px;bottom:-300px;left:20%;background:radial-gradient(circle,rgba(58,151,255,.10),transparent 65%)}
+.bg-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 45% at 50% 0%,#000 20%,transparent 75%);
+  mask-image:radial-gradient(ellipse 70% 45% at 50% 0%,#000 20%,transparent 75%);
+}
+.noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:60;transition:background .35s,border-color .35s,backdrop-filter .35s;border-bottom:1px solid transparent}
+.nav.scrolled{background:rgba(5,6,10,.72);border-bottom-color:var(--line-soft);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.nav-inner{display:flex;align-items:center;gap:36px;height:76px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand-mark{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0}
+.brand-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(58,151,255,.45))}
+.brand-name{font-weight:800;font-size:15px;letter-spacing:.03em}
+.brand-name em{font-style:normal;background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.beta-pill{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin-left:2px}
+.nav-links{display:flex;align-items:center;gap:30px;margin-left:auto}
+.nav-links a{font-size:13.5px;color:var(--muted);transition:color .2s;position:relative}
+.nav-links a:hover{color:var(--text)}
+.nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;height:1.5px;background:linear-gradient(90deg,var(--a),var(--b));transition:right .3s}
+.nav-links a:hover::after{right:0}
+.nav-actions{display:flex;align-items:center;gap:12px;margin-left:8px}
+.burger{display:none;width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.burger span{display:block;width:16px;height:1.6px;background:var(--text);border-radius:2px;transition:.25s}
+.burger.open span:nth-child(1){transform:translateY(5.6px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-5.6px) rotate(-45deg)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:12px;font-weight:700;font-size:14px;padding:13px 22px;border:1px solid transparent;cursor:pointer;transition:transform .25s,box-shadow .25s,background .25s,border-color .25s,filter .25s;white-space:nowrap}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:linear-gradient(135deg,#5aa7ff,#8fd6ff);color:#08060f;box-shadow:0 12px 34px -12px rgba(58,151,255,.65)}
+.btn-primary:hover{transform:translateY(-2px);filter:brightness(1.07);box-shadow:0 18px 44px -14px rgba(58,151,255,.8)}
+.btn-ghost{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);transform:translateY(-2px)}
+.btn-sm{padding:10px 16px;font-size:13px;border-radius:10px}
+.btn-lg{padding:16px 26px;font-size:15px;border-radius:14px}
+.btn-lg svg{width:19px;height:19px}
+.btn-block{width:100%}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:2;padding:172px 0 30px}
+.hero-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#cfd3e6;border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:999px;padding:9px 15px;margin-bottom:28px}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(55,229,143,.9);animation:pulseDot 2.4s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+h1{font-size:clamp(46px,6.2vw,76px);font-weight:800;line-height:.99;letter-spacing:-.035em}
+.hero-sub{margin-top:22px;max-width:520px;color:var(--muted);font-size:17px;line-height:1.65}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.dl-meta{display:flex;align-items:center;flex-wrap:wrap;gap:11px;margin-top:18px;font-size:12.5px;color:var(--muted-2)}
+.dl-meta .sep{width:3px;height:3px;border-radius:50%;background:#3a3f55}
+.trust{margin-top:28px;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#4d5470}
+
+/* app mockup */
+.hero-visual{position:relative;display:grid;place-items:center}
+.app-glow{position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(58,151,255,.22),rgba(143,214,255,.06) 55%,transparent 70%);filter:blur(10px);z-index:-1}
+.app-card{
+  position:relative;width:360px;border-radius:26px;padding:22px;border:1px solid transparent;
+  background:linear-gradient(#0c0e16,#0c0e16) padding-box,linear-gradient(160deg,rgba(58,151,255,.55),rgba(143,214,255,.2) 45%,rgba(255,255,255,.07)) border-box;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.app-top{display:flex;align-items:center;justify-content:space-between}
+.app-brand{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:700;letter-spacing:.16em;color:#dfe3f5}
+.app-logo{width:18px;height:18px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(58,151,255,.7))}
+.app-pill{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--green);border:1px solid rgba(55,229,143,.35);background:rgba(55,229,143,.08);padding:5px 9px;border-radius:999px}
+.power-wrap{position:relative;height:230px;display:grid;place-items:center;margin-top:2px}
+.atom-glow{position:absolute;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(58,151,255,.35),rgba(143,214,255,.12) 55%,transparent 72%);filter:blur(14px);animation:atomGlow 4.5s ease-in-out infinite}
+.atom{position:relative;width:196px;height:196px;filter:drop-shadow(0 0 26px rgba(58,151,255,.5));animation:atomFloat 6.5s ease-in-out infinite}
+@keyframes atomFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+@keyframes atomGlow{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+
+.app-status{text-align:center;font-size:15px;font-weight:800;letter-spacing:.24em;color:var(--green);margin-top:2px;text-shadow:0 0 22px rgba(55,229,143,.45)}
+.app-sub{text-align:center;font-size:12.5px;color:var(--muted);margin-top:7px}
+.app-server{display:flex;align-items:center;gap:10px;margin-top:20px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);font-size:12.5px}
+.app-server .code{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9cc9ff;border:1px solid rgba(58,151,255,.4);background:rgba(58,151,255,.12);padding:3px 7px;border-radius:6px}
+.app-server .chev{margin-left:auto;color:var(--muted-2);font-size:11px}
+.app-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.app-stats>div{padding:12px 14px;border:1px solid var(--line-soft);border-radius:12px;background:rgba(255,255,255,.02)}
+.app-stats .k{display:block;font-size:8.5px;font-weight:700;letter-spacing:.16em;color:var(--muted-2)}
+.app-stats .v{display:block;font-size:12px;font-weight:700;margin-top:5px;color:#e8ebf6}
+.float-card{position:absolute;display:flex;align-items:center;gap:9px;font-size:11.5px;color:#c9cee2;padding:10px 14px;border-radius:12px;background:rgba(13,15,22,.86);border:1px solid var(--line);backdrop-filter:blur(10px);box-shadow:0 18px 44px -14px rgba(0,0,0,.75);animation:floatY 6.5s ease-in-out infinite;z-index:2}
+.fc-ic{font-weight:800;font-size:12px;background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.fc1{top:38px;right:-34px}
+.fc2{bottom:118px;left:-52px;animation-delay:-2.2s}
+.fc3{bottom:-14px;right:12px;animation-delay:-4.1s}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+/* ---------- marquee ---------- */
+.marquee-wrap{position:relative;z-index:2;margin-top:76px;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:18px 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee-track{display:flex;gap:12px;width:max-content;animation:marquee 38s linear infinite}
+.marquee-wrap:hover .marquee-track{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.pill{display:flex;align-items:center;gap:10px;padding:9px 16px;border:1px solid rgba(255,255,255,.07);border-radius:999px;background:rgba(255,255,255,.02);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.pill .code{font-size:10px;font-weight:800;letter-spacing:.06em;color:#cdd3e8;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:5px}
+.pill .live{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(55,229,143,.8)}
+
+/* ---------- stats ---------- */
+.stats{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);margin-top:72px}
+.stat{text-align:center;padding:26px 10px}
+.stat+.stat{border-left:1px solid var(--line-soft)}
+.stat .num{font-size:clamp(34px,4vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.stat .num .accent{background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .cap{margin-top:10px;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2)}
+
+/* ---------- sections ---------- */
+.section{position:relative;z-index:2;padding:112px 0}
+.section-alt{background:linear-gradient(180deg,rgba(255,255,255,.018),transparent 55%,rgba(255,255,255,.012));border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.section-head{max-width:660px;margin-bottom:56px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:16px}
+.section-head h2,.banner h2{font-size:clamp(30px,4.2vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.06}
+.section-head p{margin-top:16px;color:var(--muted);font-size:15.5px;line-height:1.7;max-width:560px}
+
+/* features */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feature{position:relative;overflow:hidden;padding:28px;border:1px solid var(--line-soft);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));transition:transform .35s,border-color .35s,box-shadow .35s}
+.feature:hover{transform:translateY(-4px);border-color:rgba(58,151,255,.35);box-shadow:0 24px 60px -26px rgba(58,151,255,.45)}
+.ficon{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:rgba(58,151,255,.11);border:1px solid rgba(58,151,255,.25);color:#9cc9ff;margin-bottom:20px}
+.ficon svg{width:22px;height:22px}
+.feature h3{font-size:16.5px;font-weight:700;margin-bottom:9px;letter-spacing:-.01em}
+.feature p{font-size:13.5px;color:var(--muted);line-height:1.65}
+
+/* servers */
+.servers-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.stile{padding:15px 16px;border:1px solid var(--line-soft);border-radius:14px;background:rgba(255,255,255,.025);transition:transform .3s,border-color .3s,background .3s;display:flex;flex-direction:column;gap:12px}
+.stile:hover{transform:translateY(-3px);border-color:rgba(143,214,255,.3);background:rgba(255,255,255,.04)}
+.st-head{display:flex;align-items:center;justify-content:space-between}
+.st-code{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9cc9ff;background:rgba(58,151,255,.12);border:1px solid rgba(58,151,255,.3);padding:3px 7px;border-radius:6px}
+.st-ping{font-size:10.5px;color:var(--muted-2)}
+.st-name{font-size:13.5px;font-weight:600;line-height:1.25}
+.st-city{font-size:11px;color:var(--muted-2);margin-top:2px}
+.servers-note{margin-top:26px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted-2)}
+.servers-note .dot{width:6px;height:6px;border-radius:50%;background:var(--b);box-shadow:0 0 10px rgba(143,214,255,.8)}
+
+/* download */
+.dl-card{position:relative;max-width:660px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 30px;border-radius:20px;border:1px solid rgba(58,151,255,.28);background:linear-gradient(180deg,rgba(58,151,255,.09),rgba(255,255,255,.015));box-shadow:0 30px 80px -40px rgba(58,151,255,.5)}
+.dl-card-info{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dl-name{font-size:16px;font-weight:700;letter-spacing:-.01em;word-break:break-all}
+.dl-sub{font-size:12.5px;color:var(--muted-2);letter-spacing:.04em}
+.dl-card .btn{flex-shrink:0}
+
+/* steps */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.step{padding:28px;border:1px solid var(--line-soft);border-radius:18px;background:rgba(255,255,255,.02)}
+.step .n{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;background:linear-gradient(135deg,rgba(58,151,255,.9),rgba(143,214,255,.5));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:18px}
+.step h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.step p{font-size:13.5px;color:var(--muted);line-height:1.65}
+
+/* faq */
+.faq{max-width:800px;margin:0 auto}
+.faq details{border:1px solid var(--line-soft);border-radius:14px;background:rgba(255,255,255,.02);margin-bottom:10px;overflow:hidden;transition:border-color .3s}
+.faq details[open]{border-color:rgba(58,151,255,.3);background:rgba(255,255,255,.03)}
+.faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 22px;font-size:14.5px;font-weight:600}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .plus{position:relative;width:18px;height:18px;flex-shrink:0}
+.faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;top:50%;left:50%;background:var(--muted);border-radius:2px;transition:transform .3s,opacity .3s}
+.faq summary .plus::before{width:12px;height:1.7px;transform:translate(-50%,-50%)}
+.faq summary .plus::after{width:1.7px;height:12px;transform:translate(-50%,-50%)}
+.faq details[open] summary .plus::after{transform:translate(-50%,-50%) rotate(90deg);opacity:0}
+.faq details[open] summary .plus::before{background:var(--b)}
+.faq .answer{padding:0 22px 20px;font-size:13.5px;color:var(--muted);line-height:1.7;max-width:640px}
+
+/* banner */
+.banner{position:relative;overflow:hidden;margin:20px auto 110px;border-radius:26px;border:1px solid rgba(58,151,255,.35);background:radial-gradient(120% 180% at 50% -20%,rgba(58,151,255,.4),rgba(9,10,16,.4) 62%),#0a0b13;padding:58px 48px;text-align:center}
+.banner::before{content:"";position:absolute;top:-140px;left:50%;transform:translateX(-50%);width:420px;height:260px;background:radial-gradient(circle,rgba(143,214,255,.22),transparent 65%);filter:blur(30px);pointer-events:none}
+.banner-atom{position:absolute;right:-60px;top:50%;transform:translateY(-50%);width:340px;opacity:.28;pointer-events:none;filter:drop-shadow(0 0 40px rgba(58,151,255,.45))}
+.banner h2{position:relative}
+.banner p{position:relative;margin:16px auto 30px;max-width:480px;color:var(--muted);font-size:14.5px;line-height:1.7}
+.banner .btn{position:relative}
+
+/* footer */
+footer{position:relative;z-index:2;border-top:1px solid var(--line-soft);padding:60px 0 30px;background:rgba(255,255,255,.008)}
+.footer-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:44px}
+.footer-brand p{margin-top:16px;font-size:13px;color:var(--muted-2);line-height:1.7;max-width:300px}
+.footer-col h4{font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);margin-bottom:18px}
+.footer-col a{display:block;font-size:13.5px;color:#aeb4c9;margin:11px 0;transition:color .2s}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:48px;padding-top:24px;border-top:1px solid var(--line-soft);font-size:12px;color:var(--muted-2)}
+.footer-bottom .k{letter-spacing:.12em;text-transform:uppercase;font-size:10.5px}
+
+/* toast */
+.toast{position:fixed;right:24px;bottom:24px;z-index:100;display:flex;align-items:center;gap:11px;padding:14px 18px;border-radius:13px;background:#10121b;border:1px solid rgba(55,229,143,.4);box-shadow:0 24px 60px -18px rgba(0,0,0,.8);font-size:13px;color:#dfe6f5;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .35s,transform .35s}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast .tick{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(55,229,143,.14);color:var(--green);flex-shrink:0}
+.toast .tick svg{width:12px;height:12px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.stagger.in>*{opacity:1;transform:none}
+
+/* ---------- responsive ---------- */
+@media(max-width:1060px){
+  .servers-grid{grid-template-columns:repeat(4,1fr)}
+  .fc1{right:-10px}
+  .fc2{left:-16px}
+}
+@media(max-width:920px){
+  .nav-links{position:fixed;top:82px;left:20px;right:20px;display:none;flex-direction:column;align-items:flex-start;gap:6px;background:#0b0d15;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 30px 70px -20px rgba(0,0,0,.85)}
+  .nav-links.open{display:flex}
+  .nav-links a{width:100%;padding:11px 12px;border-radius:10px;font-size:14px}
+  .nav-links a:hover{background:rgba(255,255,255,.04)}
+  .nav-links a::after{display:none}
+  .burger{display:flex}
+  .nav-actions{margin-left:auto}
+  .hero{padding-top:140px}
+  .hero-grid{grid-template-columns:1fr;gap:64px}
+  .hero-copy{text-align:center}
+  .hero-sub{margin-inline:auto}
+  .cta-row,.dl-meta{justify-content:center}
+  .trust{text-align:center}
+  .hero-visual{margin-top:6px}
+  .banner-atom{display:none}
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .servers-grid{grid-template-columns:repeat(3,1fr)}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .footer-brand{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .container{width:calc(100% - 32px)}
+  .nav-inner{height:68px;gap:14px}
+  .brand-name{font-size:14px}
+  .beta-pill{display:none}
+  .nav-actions .btn{display:none}
+  .section{padding:80px 0}
+  h1{font-size:clamp(40px,11vw,56px)}
+  .hero-sub{font-size:15.5px}
+  .btn-lg{width:100%}
+  .app-card{width:100%;max-width:360px}
+  .fc1{right:-4px;top:14px}
+  .fc2{left:-4px;bottom:120px}
+  .fc3{right:6px;bottom:-18px}
+  .stats{grid-template-columns:1fr 1fr;margin-top:48px}
+  .stat:nth-child(3){border-left:none}
+  .stat{border-top:1px solid var(--line-soft)}
+  .stat:nth-child(-n+2){border-top:none}
+  .features-grid{grid-template-columns:1fr}
+  .servers-grid{grid-template-columns:1fr 1fr}
+  .dl-card{flex-direction:column;align-items:stretch;text-align:center}
+  .steps-grid{grid-template-columns:1fr}
+  .banner{padding:44px 24px;margin-bottom:80px}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}
+  .toast{left:16px;right:16px;bottom:16px;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-win" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.6 10.2 4.6v6.8H3V5.6Zm0 7h7.2v6.8L3 18.4v-5.8Zm8.3-8.2L21 3.1v8.3h-9.7V4.4Zm0 8.5H21v8.3l-9.7-1.3v-7Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5L19.5 7"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2Z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3.1"/><path d="m4.5 19.5 15-15"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.6 3 8.3 7 10 4-1.7 7-5.4 7-10V6l-7-3Z"/><path d="m9.1 12 2.1 2.1 3.8-4.2"/></symbol>
+    <symbol id="i-split" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a3 3 0 0 0 3 3h9"/><path d="m15 8 3 3-3 3"/><path d="M6 21v-5a3 3 0 0 1 3-3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="3.5"/><path d="m10 9.2 4.8 2.8L10 14.8V9.2Z"/></symbol>
+    <symbol id="i-click" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 9.5 10.8 4.3-4.7 1.7-1.7 4.7L9.5 9.5Z"/><path d="M4.5 4.5 3 6M6.5 3 5 4.5M3.5 9.5H5.5"/></symbol>
+  </defs>
+</svg>
+
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<div class="orb orb-c"></div>
+<div class="bg-grid"></div>
+<div class="noise"></div>
+
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark"><img src="assets/logo-transparent.svg" alt="Natria VPN"></span>
+      <span class="brand-name">NATRIA <em>VPN</em></span>
+      <span class="beta-pill">beta</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#features">Возможности</a>
+      <a href="#servers">Серверы</a>
+        <a href="#download">Загрузка</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary btn-sm" href="download/NATRIA_VPN_Setup.msi" download>
+        <svg><use href="#i-win"/></svg> Скачать
+      </a>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy reveal">
+      <div class="hero-badge"><span class="dot"></span> Открытая бета</div>
+      <h1>Твой интернет.<br><span class="grad">Без границ.</span></h1>
+      <p class="hero-sub">VPN, который просто работает. Один клик — и весь мир снова открыт.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary btn-lg" href="download/NATRIA_VPN_Setup.msi" download>
+          <svg><use href="#i-win"/></svg> Скачать
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#features">Как это работает</a>
+      </div>
+      <div class="dl-meta">
+        <span>Windows 10/11</span><span class="sep"></span><span>x64</span><span class="sep"></span><span>v1.0.4 · 4 МБ</span>
+      </div>
+      <div class="trust">WireGuard® · ChaCha20-Poly1305 · 0 логов</div>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="app-glow"></div>
+      <div class="app-card">
+        <div class="app-top">
+          <div class="app-brand"><img class="app-logo" src="assets/logo-transparent.svg" alt=""> NATRIA VPN</div>
+          <span class="app-pill">ПОДКЛЮЧЕНО</span>
+        </div>
+        <div class="power-wrap">
+          <div class="atom-glow"></div>
+          <img class="atom" src="assets/atom-hero.svg" alt="Natria VPN">
+        </div>
+        <div class="app-status">ЗАЩИЩЕНО</div>
+        <div class="app-sub">Нидерланды · Амстердам</div>
+        <div class="app-server"><span class="code">NL</span><span>Нидерланды — Амстердам</span><span class="chev">▾</span></div>
+        <div class="app-stats">
+          <div><span class="k">IP</span><span class="v">45.137.62.9</span></div>
+          <div><span class="k">СКОРОСТЬ</span><span class="v">93.4 Мбит/с</span></div>
+        </div>
+      </div>
+      <div class="float-card fc1"><span class="fc-ic">✓</span> Kill Switch ON</div>
+      <div class="float-card fc2"><span class="fc-ic">0</span> логов хранится</div>
+      <div class="float-card fc3"><span class="fc-ic">∞</span> трафик без границ</div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap reveal">
+  <div class="marquee-track">
+    <div class="pill"><span class="live"></span><span class="code">NL</span> Нидерланды · Амстердам</div>
+    <div class="pill"><span class="live"></span><span class="code">DE</span> Германия · Франкфурт</div>
+    <div class="pill"><span class="live"></span><span class="code">FR</span> Франция · Париж</div>
+    <div class="pill"><span class="live"></span><span class="code">US</span> США · Нью-Йорк</div>
+    <div class="pill"><span class="live"></span><span class="code">GB</span> Великобритания · Лондон</div>
+    <div class="pill"><span class="live"></span><span class="code">TR</span> Турция · Стамбул</div>
+    <div class="pill"><span class="live"></span><span class="code">JP</span> Япония · Токио</div>
+    <div class="pill"><span class="live"></span><span class="code">SG</span> Сингапур</div>
+    <div class="pill"><span class="live"></span><span class="code">KZ</span> Казахстан · Алматы</div>
+    <div class="pill"><span class="live"></span><span class="code">FI</span> Финляндия · Хельсинки</div>
+    <div class="pill"><span class="live"></span><span class="code">NL</span> Нидерланды · Амстердам</div>
+    <div class="pill"><span class="live"></span><span class="code">DE</span> Германия · Франкфурт</div>
+    <div class="pill"><span class="live"></span><span class="code">FR</span> Франция · Париж</div>
+    <div class="pill"><span class="live"></span><span class="code">US</span> США · Нью-Йорк</div>
+    <div class="pill"><span class="live"></span><span class="code">GB</span> Великобритания · Лондон</div>
+    <div class="pill"><span class="live"></span><span class="code">TR</span> Турция · Стамбул</div>
+    <div class="pill"><span class="live"></span><span class="code">JP</span> Япония · Токио</div>
+    <div class="pill"><span class="live"></span><span class="code">SG</span> Сингапур</div>
+    <div class="pill"><span class="live"></span><span class="code">KZ</span> Казахстан · Алматы</div>
+    <div class="pill"><span class="live"></span><span class="code">FI</span> Финляндия · Хельсинки</div>
+  </div>
+</div>
+
+<section class="stats container reveal">
+  <div class="stat"><div class="num"><span data-count="120">0</span><span class="accent">+</span></div><div class="cap">серверов</div></div>
+  <div class="stat"><div class="num"><span data-count="47">0</span></div><div class="cap">стран</div></div>
+  <div class="stat"><div class="num"><span class="accent">24</span><span>/7</span></div><div class="cap">поддержка</div></div>
+  <div class="stat"><div class="num"><span data-count="99.9" data-decimals="1">0</span><span class="accent">%</span></div><div class="cap">аптайм</div></div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Возможности</div>
+      <h2>Всё, что нужно.<br>Ничего лишнего.</h2>
+      <p>Мы убрали всё, что мешает. Осталось только то, зачем ты пришёл.</p>
+    </div>
+    <div class="features-grid stagger">
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-bolt"/></svg></div>
+        <h3>Скорость без компромиссов</h3>
+        <p>Протокол WireGuard внутри. Каналы до 10 Гбит/с и пинг от 4 мс — 4K без единой буферизации.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-eye"/></svg></div>
+        <h3>Ноль логов</h3>
+        <p>Мы не пишем историю подключений, IP и трафик. Нечего хранить — нечего отдавать.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-shield"/></svg></div>
+        <h3>Kill Switch</h3>
+        <p>Связь оборвалась — клиент мгновенно блокирует трафик. Ни один пакет не уйдёт в открытую сеть.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-split"/></svg></div>
+        <h3>Split Tunneling</h3>
+        <p>Выбирай, какие приложения идут через туннель, а какие — напрямую. Полный контроль над трафиком.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-play"/></svg></div>
+        <h3>Стриминг и P2P</h3>
+        <p>Netflix, YouTube в 4K, торренты — без бутылочного горлышка.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg><use href="#i-click"/></svg></div>
+        <h3>Один клик</h3>
+        <p>Скачал, открыл, подключился. Никаких настроек, регистраций и подтверждений по почте.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="servers">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Серверы</div>
+      <h2>47 стран. <span class="grad">Один клик.</span></h2>
+      <p>От Амстердама до Токио. Каналы на 10 Гбит/с, пинг от 4 мс и никаких очередей в часы пик.</p>
+    </div>
+    <div class="servers-grid stagger">
+      <div class="stile"><div class="st-head"><span class="st-code">NL</span><span class="st-ping">12 мс</span></div><div><div class="st-name">Нидерланды</div><div class="st-city">Амстердам</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">DE</span><span class="st-ping">18 мс</span></div><div><div class="st-name">Германия</div><div class="st-city">Франкфурт</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">FI</span><span class="st-ping">9 мс</span></div><div><div class="st-name">Финляндия</div><div class="st-city">Хельсинки</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">FR</span><span class="st-ping">24 мс</span></div><div><div class="st-name">Франция</div><div class="st-city">Париж</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">GB</span><span class="st-ping">29 мс</span></div><div><div class="st-name">Великобритания</div><div class="st-city">Лондон</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">US</span><span class="st-ping">41 мс</span></div><div><div class="st-name">США</div><div class="st-city">Нью-Йорк</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">TR</span><span class="st-ping">22 мс</span></div><div><div class="st-name">Турция</div><div class="st-city">Стамбул</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">KZ</span><span class="st-ping">36 мс</span></div><div><div class="st-name">Казахстан</div><div class="st-city">Алматы</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">JP</span><span class="st-ping">112 мс</span></div><div><div class="st-name">Япония</div><div class="st-city">Токио</div></div></div>
+      <div class="stile"><div class="st-head"><span class="st-code">SG</span><span class="st-ping">138 мс</span></div><div><div class="st-name">Сингапур</div><div class="st-city">Сингапур</div></div></div>
+    </div>
+    <div class="servers-note reveal"><span class="dot"></span> И ещё 37 стран внутри клиента — полный список обновляется каждую неделю.</div>
+  </div>
+</section>
+
+<section class="section" id="download">
+  <div class="container">
+    <div class="section-head reveal" style="margin-inline:auto;text-align:center">
+      <div class="kicker">Загрузка</div>
+      <h2>Один файл.<br><span class="grad">И ты в сети.</span></h2>
+      <p style="margin-inline:auto">NATRIA VPN для Windows 10/11 x64. Скачай, запусти, подключись.</p>
+    </div>
+    <div class="dl-card reveal">
+      <div class="dl-card-info">
+        <span class="dl-name">NATRIA_VPN_Setup.msi</span>
+        <span class="dl-sub">Windows 10/11 · x64 · v1.0.4 · 4 МБ</span>
+      </div>
+      <a class="btn btn-primary btn-lg" href="download/NATRIA_VPN_Setup.msi" download>
+        <svg><use href="#i-win"/></svg> Скачать
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Как это работает</div>
+      <h2>Три шага.<br>Дальше — просто работает.</h2>
+    </div>
+    <div class="steps-grid stagger">
+      <div class="step"><div class="n">01</div><h3>Скачай клиент</h3><p>Нажми «Скачать» — придёт один установочный файл, около 4 МБ. Без тулбаров и лишнего.</p></div>
+      <div class="step"><div class="n">02</div><h3>Открой и подключись</h3><p>Запусти NATRIA VPN, нажми большую кнопку. Клиент сам выберет лучший сервер рядом с тобой.</p></div>
+      <div class="step"><div class="n">03</div><h3>Живи без границ</h3><p>Всё. Трафик шифруется, IP скрыт, сайты и сервисы открыты. Аккаунт не нужен — вообще.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head reveal" style="margin-inline:auto;text-align:center">
+      <div class="kicker">FAQ</div>
+      <h2>Коротко о главном.</h2>
+    </div>
+    <div class="faq reveal">
+      <details open>
+        <summary>Вы храните логи? <span class="plus"></span></summary>
+        <div class="answer">Нет. Мы не записываем историю подключений, IP-адреса и трафик. Данных просто не существует — их негде запросить и нечего отдать.</div>
+      </details>
+      <details>
+        <summary>Какая скорость? <span class="plus"></span></summary>
+        <div class="answer">Каналы до 10 Гбит/с на серверах и протокол WireGuard. В реальности скорость упирается в твоего провайдера — мы её не режем.</div>
+      </details>
+      <details>
+        <summary>Это безопасно? <span class="plus"></span></summary>
+        <div class="answer">Шифрование ChaCha20-Poly1305, защита от DNS-утечек и Kill Switch. Если туннель падает — трафик блокируется, а не уходит в открытую сеть.</div>
+      </details>
+      <details>
+        <summary>Какие устройства поддерживаются? <span class="plus"></span></summary>
+        <div class="answer">Сейчас Windows 10/11 x64. Android и iOS — на подходе, macOS — в работе. Скачивай клиент и следи за обновлениями.</div>
+      </details>
+      <details>
+        <summary>Нужен аккаунт? <span class="plus"></span></summary>
+        <div class="answer">Нет. Скачал, открыл, подключился. Ни почты, ни пароля, ни подтверждений.</div>
+      </details>
+      <details>
+        <summary>Откуда скачать клиент? <span class="plus"></span></summary>
+        <div class="answer">Прямо с этой страницы. Файл называется NATRIA_VPN_Setup.msi, весит около 4 МБ. Никаких зеркал и сторонних сайтов.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="banner reveal">
+    <img class="banner-atom" src="assets/atom-hero.svg" alt="">
+    <h2>Хватит смотреть<br>на закрытые двери.</h2>
+    <p>Скачай NATRIA VPN — и открой интернет заново.</p>
+    <a class="btn btn-primary btn-lg" href="download/NATRIA_VPN_Setup.msi" download>
+      <svg><use href="#i-win"/></svg> Скачать для Windows
+    </a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#top">
+          <span class="brand-mark"><img src="assets/logo-transparent.svg" alt="Natria VPN"></span>
+          <span class="brand-name">NATRIA <em>VPN</em></span>
+        </a>
+        <p>VPN, который не следит. Сделан для тех, кто устал от границ — в интернете и не только.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Продукт</h4>
+        <a href="#features">Возможности</a>
+        <a href="#servers">Серверы</a>
+      <a href="#download">Скачать</a>
+        <a href="download/NATRIA_VPN_Setup.msi" download>Скачать</a>
+      </div>
+      <div class="footer-col">
+        <h4>Поддержка</h4>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:support@natriavpn.store">support@natriavpn.store</a>
+        <a href="#top">Telegram · @natriavpn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> NATRIA VPN. Все права защищены.</span>
+      <span class="k">0 логов · 0 следов</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">
+  <span class="tick"><svg><use href="#i-check"/></svg></span>
+  <span>Загрузка NATRIA_VPN_Setup.msi началась</span>
+</div>
+
+<script>
+(function () {
+  var nav = document.getElementById('nav');
+  var onScroll = function () {
+    if (window.scrollY > 12) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var burger = document.getElementById('burger');
+  var links = document.getElementById('navLinks');
+  burger.addEventListener('click', function () {
+    burger.classList.toggle('open');
+    links.classList.toggle('open');
+  });
+  links.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      burger.classList.remove('open');
+      links.classList.remove('open');
+    });
+  });
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .stagger').forEach(function (el) {
+    if (el.classList.contains('stagger')) {
+      Array.prototype.forEach.call(el.children, function (child, i) {
+        child.style.transitionDelay = (i * 70) + 'ms';
+      });
+    }
+    observer.observe(el);
+  });
+
+  var counterObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      var target = parseFloat(el.getAttribute('data-count'));
+      var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+      var start = null;
+      var duration = 1500;
+      var step = function (ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * eased).toFixed(decimals);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target.toFixed(decimals);
+      };
+      requestAnimationFrame(step);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+
+  document.querySelectorAll('[data-count]').forEach(function (el) {
+    counterObserver.observe(el);
+  });
+
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+  document.querySelectorAll('a[href$=".msi"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 3800);
+    });
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
